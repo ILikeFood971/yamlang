@@ -120,9 +120,9 @@ yamlang {
     // There should be multiple "*.yml" language files inside
     inputDir = 'assets/mymod/lang'
 
-    // The output path of converted json language file, related to the resources dir
+    // The output paths of converted json language file, related to the resources dir
     // When not set, it will use inputDir as the fallback value
-    outputDir = 'assets/mymod/jsonlang'
+    outputDirs = ['assets/mymod/jsonlang', 'data/mymod/lang']
 
     // If the yaml language files ends with ".yaml" instead of ".yml"
     targetFilePattern = '*.yaml'

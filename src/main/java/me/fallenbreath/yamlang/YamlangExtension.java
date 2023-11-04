@@ -26,7 +26,7 @@ public interface YamlangExtension
 	 * <p>
 	 * When not set, it will use {@link #getInputDir} as the fallback value
 	 */
-	Property<String> getOutputDir();
+	Property<Collection<String>> getOutputDirs();
 
 	/**
 	 * The file name pattern of the language files in yaml

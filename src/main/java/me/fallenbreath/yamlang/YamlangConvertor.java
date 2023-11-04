@@ -5,7 +5,7 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
 
 import java.nio.file.Path;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class YamlangConvertor extends DefaultTask
 {
@@ -37,25 +37,26 @@ public abstract class YamlangConvertor extends DefaultTask
 	{
 		YamlangExtension extension = this.getProject().getExtensions().getByType(YamlangExtension.class);
 		String inputDir = extension.getInputDir().getOrElse("");
-		String outputDir = extension.getOutputDir().getOrElse(inputDir);
+		Collection<String> outputDirs = extension.getOutputDirs().getOrElse(Collections.singletonList(inputDir));
 		String targetFilePattern = extension.getTargetFilePattern().getOrElse("*" + YAML_PREFIX);
 		boolean preserveYaml = extension.getPreserveYaml().getOrElse(false);
 
-		if (inputDir.isEmpty() || outputDir.isEmpty())
+		if (inputDir.isEmpty() || outputDirs.isEmpty())
 		{
 			return;
 		}
 
 		Path basePath = Objects.requireNonNull(this.sourceSet.getOutput().getResourcesDir()).toPath();
-
-		this.getProject().copy(copySpec -> {
-			copySpec.setFilteringCharset(extension.getCharset().getOrElse("UTF-8"));
-			copySpec.from(basePath.resolve(inputDir));
-			copySpec.include(targetFilePattern);
-			copySpec.filter(Yamlang2JsonlangMapper.class);
-			copySpec.rename(YamlangConvertor::renameYaml2Json);
-			copySpec.into(basePath.resolve(outputDir));
-		});
+		for (String outputDir : outputDirs) {
+			this.getProject().copy(copySpec -> {
+				copySpec.setFilteringCharset(extension.getCharset().getOrElse("UTF-8"));
+				copySpec.from(basePath.resolve(inputDir));
+				copySpec.include(targetFilePattern);
+				copySpec.filter(Yamlang2JsonlangMapper.class);
+				copySpec.rename(YamlangConvertor::renameYaml2Json);
+				copySpec.into(basePath.resolve(outputDir));
+			});
+		}
 		if (!preserveYaml)
 		{
 			this.getProject().delete(deleteSpec -> {
